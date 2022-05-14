@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="/stylesheets/style.css" />
+    </head>
+
+    <body>
+        <div class="main-container">
+            <form action="/todoadd" method="POST" class="inputs">
+                <input type="text" name="todo" placeholder="item name" />
+                <br />
+                <textarea
+                    name="description"
+                    placeholder="item description"
+                ></textarea>
+                <br />
+                <button>
+                    <img width="30" src="/images/downarrow.png" alt="" />
+                </button>
+            </form>
+            <hr />
+            <ul>
+                <% if(todos.length===0) { %>
+                <p class="noitem">NO ITEM FOUND</p>
+                <% }%> <% todos.forEach((todo, index)=> { %>
+                <li>
+                    <span>
+                        <a href="/desc/<%= index%>"> <%= todo.todo%> </a>
+
+                        <a href="/delete/<%= index%>"
+                            ><img width="30" src="/images/remove.png" alt=""
+                        /></a>
+                    </span>
+                    <p><%= todo.description.substr(0,40) %>...</p>
+                </li>
+                <% })%>
+            </ul>
+        </div>
+    </body>
+</html>

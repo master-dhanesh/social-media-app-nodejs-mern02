@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="/stylesheets/style.css" />
+    </head>
+
+    <body>
+        <div class="main-container">
+            <form action="/desc/<%= index%>" method="POST" class="inputs">
+                <input
+                    value="<%= todo.todo%>"
+                    type="text"
+                    name="todo"
+                    placeholder="item name"
+                />
+                <br />
+                <textarea
+                    style="height: 100px"
+                    name="description"
+                    placeholder="item description"
+                >
+<%= todo.description %></textarea
+                >
+                <br />
+                <button>
+                    <img width="30" src="/images/upload.png" alt="" />
+                </button>
+            </form>
+            <hr />
+            <div>
+                <span>
+                    <p><%= todo.todo%></p>
+                    <p><%= todo.description%></p>
+                </span>
+                <p><%= todo.description%></p>
+                <br />
+                <a href="/">Home</a>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,100 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+.main-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* flex-direction: column; */
+    /* background-color: tomato; */
+}
+.inputs input {
+    width: 200px;
+    height: 50px;
+    /* padding: 1vmax; */
+    font: 400 1.5vmax "Gilroy";
+    outline: none;
+    border: none;
+    border-bottom: 2px solid rgb(171, 64, 45);
+    background-color: transparent;
+    color: tomato;
+}
+
+.inputs textarea {
+    resize: none;
+    margin-top: 2vmax;
+    width: 200px;
+    height: 50px;
+    /* padding: 1vmax; */
+    font: 400 1.5vmax "Gilroy";
+    outline: none;
+    border: none;
+    border-bottom: 2px solid rgb(171, 64, 45);
+    background-color: transparent;
+    color: tomato;
+}
+/* .inputs input::placeholder {
+  color: rgb(215, 214, 214);
+} */
+
+.inputs button {
+    border: none;
+    background-color: rgb(224, 224, 224);
+    outline: none;
+    cursor: pointer;
+    width: 200px;
+    text-align: left;
+}
+
+hr {
+    margin: 1vmax 0;
+    width: 1px;
+    border: none;
+    background-color: rgb(93, 92, 92);
+    height: 250px;
+    margin: 0 2vmax;
+}
+
+ul {
+    list-style: none;
+    width: 230px;
+}
+
+ul li {
+    background-color: rgba(246, 115, 92, 0.2);
+
+    font: 600 1.2vmax "Gilroy";
+    padding: 0.5vmax 1vmax;
+    color: rgb(175, 70, 52);
+    margin-bottom: 0.5vmax;
+}
+
+ul li span {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.noitem {
+    text-align: center;
+    color: tomato;
+    font: 700 1.5vmax "Gilroy";
+    margin-top: 2vmax;
+}
+
+ul a {
+    color: tomato !important;
+    text-decoration: none;
+}
