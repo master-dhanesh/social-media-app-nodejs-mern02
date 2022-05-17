@@ -10,11 +10,11 @@
 
     <body>
         <div class="main-container">
-            <form action="/desc/<%= index%>" method="POST" class="inputs">
+            <form action="/desc/<%= todo._id %>" method="POST" class="inputs">
                 <input
-                    value="<%= todo.todo%>"
+                    value="<%= todo.title%>"
                     type="text"
-                    name="todo"
+                    name="title"
                     placeholder="item name"
                 />
                 <br />
@@ -33,7 +33,7 @@
             <hr />
             <div>
                 <span>
-                    <p><%= todo.todo%></p>
+                    <p><%= todo.title%></p>
                     <p><%= todo.description%></p>
                 </span>
                 <p><%= todo.description%></p>

@@ -11,7 +11,7 @@
     <body>
         <div class="main-container">
             <form action="/todoadd" method="POST" class="inputs">
-                <input type="text" name="todo" placeholder="item name" />
+                <input type="text" name="title" placeholder="item name" />
                 <br />
                 <textarea
                     name="description"
@@ -29,9 +29,9 @@
                 <% }%> <% todos.forEach((todo, index)=> { %>
                 <li>
                     <span>
-                        <a href="/desc/<%= index%>"> <%= todo.todo%> </a>
+                        <a href="/desc/<%= todo._id %>"> <%= todo.title%> </a>
 
-                        <a href="/delete/<%= index%>"
+                        <a href="/delete/<%= todo._id%>"
                             ><img width="30" src="/images/remove.png" alt=""
                         /></a>
                     </span>

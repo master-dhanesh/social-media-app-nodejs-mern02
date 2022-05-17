@@ -1,52 +1,49 @@
 var express = require("express");
 var router = express.Router();
-const uuid = require("uuid").v4;
-
-const todos_db = [
-    {
-        id: "8974jkd",
-        todo: "Item 1",
-        description:
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odio, repellat!",
-    },
-    {
-        id: "iurkj39",
-        todo: "Item 2",
-        description:
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odio, repellat!",
-    },
-];
+const Todo = require("../models/todoModel");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-    res.render("index", { todos: todos_db, index: "", todo: "" });
+    Todo.find()
+        .then((todos) => res.render("index", { todos, todo: null }))
+        .catch((err) => res.send(err));
 });
 
 /* POST todoadd page. */
 router.post("/todoadd", function (req, res, next) {
-    const newtodo = { ...req.body, id: uuid() };
-    todos_db.push(newtodo);
-    res.redirect("/");
+    // const newtodo = { ...req.body, id: uuid() };
+    // todos_db.push(newtodo);
+    Todo.create(req.body)
+        .then(() => res.redirect("/"))
+        .catch((err) => res.send(err));
 });
 
 /* GET delete/:id page. */
-router.get("/delete/:index", function (req, res, next) {
-    todos_db.splice(req.params.index, 1);
-    res.redirect("/");
+router.get("/delete/:id", function (req, res, next) {
+    Todo.findByIdAndDelete(req.params.id)
+        .then(() => res.redirect("/"))
+        .catch((err) => res.send(err));
+
+    // todos_db.splice(req.params.index, 1);
 });
 
 /* GET desc/:id page. */
-router.get("/desc/:index", function (req, res, next) {
-    const todo = { ...todos_db[req.params.index] };
-    res.render("desc", { todo, todos: "", index: req.params.index });
+router.get("/desc/:id", function (req, res, next) {
+    Todo.findById(req.params.id)
+        .then((todo) => res.render("desc", { todo, todos: null }))
+        .catch((err) => res.send(err));
+    // const todo = { ...todos_db[req.params.index] };
 });
 
 /* POST desc/:id page. */
-router.post("/desc/:index", function (req, res, next) {
-    const activetodo = { ...todos_db[req.params.index] };
-    const updatedtodo = { ...activetodo, ...req.body };
-    todos_db[req.params.index] = updatedtodo;
-    res.redirect("/");
+router.post("/desc/:id", function (req, res, next) {
+    // const activetodo = { ...todos_db[req.params.index] };
+    // const updatedtodo = { ...activetodo, ...req.body };
+    // todos_db[req.params.index] = updatedtodo;
+    const updatedTodo = req.body;
+    Todo.findByIdAndUpdate(req.params.id, { $set: updatedTodo }, { new: true })
+        .then(() => res.redirect("/"))
+        .catch((err) => res.send(err));
 });
 
 module.exports = router;
