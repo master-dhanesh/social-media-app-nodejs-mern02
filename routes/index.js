@@ -1,49 +1,69 @@
 var express = require("express");
 var router = express.Router();
-const Todo = require("../models/todoModel");
+
+const User = require("../models/userModel");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const { isLoggedIn } = require("../middleware/auth");
+
+passport.use(new LocalStrategy(User.authenticate()));
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-    Todo.find()
-        .then((todos) => res.render("index", { todos, todo: null }))
+    res.render("index");
+});
+
+router.get("/login", function (req, res, next) {
+    res.render("login");
+});
+
+router.get("/register", function (req, res, next) {
+    res.render("register");
+});
+
+router.post("/register", function (req, res, next) {
+    const { username, name, email, password } = req.body;
+    const newUser = new User({ username, name, email });
+
+    User.register(newUser, password)
+        .then((user) => {
+            res.redirect("/login");
+        })
+        .catch((err) => res.send(err));
+
+    // User.create(req.body)
+    //     .then(() => res.redirect("/login"))
+    //     .catch((err) => {
+    //         if (err._message) {
+    //             const { _message, name, message } = err;
+    //             res.json({ _message, name, message });
+    //         } else {
+    //             res.send(err);
+    //         }
+    //     });
+});
+
+router.post(
+    "/login",
+    passport.authenticate("local", {
+        successRedirect: "/profile",
+        failureRedirect: "/login",
+    }),
+    function (req, res, next) {}
+);
+
+router.get("/profile", isLoggedIn, function (req, res, next) {
+    // console.log(req.user);
+    User.find()
+        .then((users) => {
+            res.render("profile", { users });
+        })
         .catch((err) => res.send(err));
 });
 
-/* POST todoadd page. */
-router.post("/todoadd", function (req, res, next) {
-    // const newtodo = { ...req.body, id: uuid() };
-    // todos_db.push(newtodo);
-    Todo.create(req.body)
-        .then(() => res.redirect("/"))
-        .catch((err) => res.send(err));
-});
-
-/* GET delete/:id page. */
-router.get("/delete/:id", function (req, res, next) {
-    Todo.findByIdAndDelete(req.params.id)
-        .then(() => res.redirect("/"))
-        .catch((err) => res.send(err));
-
-    // todos_db.splice(req.params.index, 1);
-});
-
-/* GET desc/:id page. */
-router.get("/desc/:id", function (req, res, next) {
-    Todo.findById(req.params.id)
-        .then((todo) => res.render("desc", { todo, todos: null }))
-        .catch((err) => res.send(err));
-    // const todo = { ...todos_db[req.params.index] };
-});
-
-/* POST desc/:id page. */
-router.post("/desc/:id", function (req, res, next) {
-    // const activetodo = { ...todos_db[req.params.index] };
-    // const updatedtodo = { ...activetodo, ...req.body };
-    // todos_db[req.params.index] = updatedtodo;
-    const updatedTodo = req.body;
-    Todo.findByIdAndUpdate(req.params.id, { $set: updatedTodo }, { new: true })
-        .then(() => res.redirect("/"))
-        .catch((err) => res.send(err));
+router.get("/logout", function (req, res, next) {
+    req.logout();
+    res.redirect("/");
 });
 
 module.exports = router;

@@ -10,10 +10,13 @@
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
     "express": "~4.16.1",
+    "express-session": "^1.17.3",
     "http-errors": "~1.6.3",
     "mongoose": "^6.3.3",
     "morgan": "~1.9.1",
-    "nodemon": "^2.0.16",
-    "uuid": "^8.3.2"
+    "passport": "^0.5.3",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^7.1.1",
+    "validator": "^13.7.0"
   }
 }

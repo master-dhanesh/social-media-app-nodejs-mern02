@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
-exports.mongodbconnection = () => {
+exports.getconnection = () => {
     mongoose
-        .connect("mongodb://localhost/mernmorning")
-        .then(() => console.log("database connected!"))
+        .connect("mongodb://localhost/usermern2")
+        .then(() => console.log("mongodb connected"))
         .catch((err) => console.log(err.message));
 };
