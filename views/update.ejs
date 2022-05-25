@@ -1,0 +1,42 @@
+<%- include('partials/header')%>
+<div class="container p-5 text-center">
+    <h1 class="text-tomato mb-4">User | Update Page</h1>
+    <form
+        class="w-25 text m-auto"
+        action="/update/<%= user._id%>"
+        method="POST"
+    >
+        <div class="row mb-4">
+            <input
+                placeholder="Enter Full Name"
+                name="name"
+                type="text"
+                value="<%= user.name%>"
+                class="form-control pt-2 pb-2"
+            />
+        </div>
+        <div class="row mb-4">
+            <input
+                placeholder="Enter Username"
+                name="username"
+                type="text"
+                value="<%= user.username%>"
+                class="form-control pt-2 pb-2"
+            />
+        </div>
+        <div class="row mb-4">
+            <input
+                placeholder="Enter Email"
+                name="email"
+                type="email"
+                value="<%= user.email%>"
+                class="form-control pt-2 pb-2"
+            />
+        </div>
+
+        <button class="btn btn-dark btn-block w-100 tomato m_btn p-2 ps-5 pe-5">
+            Update User
+        </button>
+    </form>
+</div>
+<%- include('partials/footer')%>

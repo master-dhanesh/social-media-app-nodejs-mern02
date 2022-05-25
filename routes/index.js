@@ -127,4 +127,28 @@ router.post("/change-password/", async function (req, res, next) {
     }
 });
 
+router.get("/delete/:id", isLoggedIn, function (req, res, next) {
+    const { id } = req.params;
+    User.findByIdAndDelete(id)
+        .then(() => {
+            if (id === req.user._id) return res.redirect("/logout");
+            res.redirect("/profile");
+        })
+        .catch((err) => res.send(err));
+});
+
+router.get("/update/:id", isLoggedIn, function (req, res, next) {
+    const { id } = req.params;
+    User.findById(id)
+        .then((user) => res.render("update", { user }))
+        .catch((err) => res.send(err));
+});
+
+router.post("/update/:id", isLoggedIn, function (req, res, next) {
+    const { id } = req.params;
+    User.findByIdAndUpdate(id, { ...req.body }, { new: true })
+        .then(() => res.redirect("/profile"))
+        .catch((err) => res.send(err));
+});
+
 module.exports = router;

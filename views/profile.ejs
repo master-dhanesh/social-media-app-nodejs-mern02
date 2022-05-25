@@ -12,9 +12,17 @@
                 <%= user.name%> | <%= user.email%>
             </div>
             <div class="d-flex">
-                <span class="badge bg-primary rounded-pill">update</span>
+                <a
+                    href="/update/<%= user._id%>"
+                    class="badge bg-primary text-light text-decoration-none rounded-pill"
+                    >update</a
+                >
                 &nbsp;
-                <span class="badge bg-danger rounded-pill">delete</span>
+                <a
+                    href="/delete/<%= user._id%>"
+                    class="badge bg-danger text-light text-decoration-none rounded-pill"
+                    >delete</a
+                >
             </div>
         </li>
         <% }) %>
