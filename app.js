@@ -12,7 +12,6 @@ const session = require("express-session");
 require("./models/database").getconnection();
 
 var indexRouter = require("./routes/index");
-var uploadRouter = require("./routes/upload");
 
 var app = express();
 
@@ -39,7 +38,6 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use("/", indexRouter);
-app.use("/upload", uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

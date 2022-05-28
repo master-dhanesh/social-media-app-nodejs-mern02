@@ -32,6 +32,10 @@ const userModel = new Schema({
         type: Date,
         default: Date.now,
     },
+    avatar: {
+        type: String,
+        default: "dummy.png",
+    },
 });
 
 userModel.plugin(plm);

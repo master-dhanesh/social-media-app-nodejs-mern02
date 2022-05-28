@@ -5,6 +5,9 @@ const User = require("../models/userModel");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const { isLoggedIn } = require("../middleware/auth");
+const upload = require("../middleware/multer");
+
+const fs = require("fs");
 
 passport.use(new LocalStrategy(User.authenticate()));
 
@@ -22,25 +25,21 @@ router.get("/register", function (req, res, next) {
 });
 
 router.post("/register", function (req, res, next) {
-    const { username, name, email, password } = req.body;
-    const newUser = new User({ username, name, email });
+    upload(req, res, (err) => {
+        const { username, name, email, password } = req.body;
+        const newUser = new User({
+            username,
+            name,
+            email,
+            avatar: req.file.filename,
+        });
 
-    User.register(newUser, password)
-        .then((user) => {
-            res.redirect("/login");
-        })
-        .catch((err) => res.send(err));
-
-    // User.create(req.body)
-    //     .then(() => res.redirect("/login"))
-    //     .catch((err) => {
-    //         if (err._message) {
-    //             const { _message, name, message } = err;
-    //             res.json({ _message, name, message });
-    //         } else {
-    //             res.send(err);
-    //         }
-    //     });
+        User.register(newUser, password)
+            .then((user) => {
+                res.redirect("/login");
+            })
+            .catch((err) => res.send(err));
+    });
 });
 
 router.post(
@@ -51,17 +50,6 @@ router.post(
     }),
     function (req, res, next) {}
 );
-
-// router.post("/login", function (req, res, next) {
-//     passport.authenticate("local", function (err, user, info) {
-//         if (err) return res.send(err);
-//         if (!user) return res.send(info);
-//         req.logIn(user, function (err) {
-//             if (err) return next(err);
-//             res.redirect("/profile");
-//         });
-//     })(req, res, next);
-// });
 
 router.get("/profile", isLoggedIn, function (req, res, next) {
     // console.log(req.user);
@@ -130,7 +118,8 @@ router.post("/change-password/", async function (req, res, next) {
 router.get("/delete/:id", isLoggedIn, function (req, res, next) {
     const { id } = req.params;
     User.findByIdAndDelete(id)
-        .then(() => {
+        .then((user) => {
+            fs.unlinkSync(`./public/uploads/${user.avatar}`);
             if (id === req.user._id) return res.redirect("/logout");
             res.redirect("/profile");
         })
@@ -145,10 +134,27 @@ router.get("/update/:id", isLoggedIn, function (req, res, next) {
 });
 
 router.post("/update/:id", isLoggedIn, function (req, res, next) {
-    const { id } = req.params;
-    User.findByIdAndUpdate(id, { ...req.body }, { new: true })
-        .then(() => res.redirect("/profile"))
-        .catch((err) => res.send(err));
+    upload(req, res, (err) => {
+        const { username, name, email, oldavatar } = req.body;
+        const updatedUser = {
+            username,
+            name,
+            email,
+        };
+
+        if (req.file && req.file.filename) {
+            const avatar = req.file.filename;
+            updatedUser.avatar = avatar;
+            fs.unlinkSync(`./public/uploads/${oldavatar}`);
+        }
+
+        const { id } = req.params;
+        User.findByIdAndUpdate(id, { $set: updatedUser }, { new: true })
+            .then(() => {
+                res.redirect("/profile");
+            })
+            .catch((err) => res.send(err));
+    });
 });
 
 module.exports = router;
