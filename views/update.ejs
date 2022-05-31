@@ -44,11 +44,7 @@
 
             <input type="hidden" name="oldavatar" value="<%= user.avatar %>" />
 
-            <img
-                class="mt-3 preview"
-                src="/uploads/<%= user.avatar %>"
-                alt=""
-            />
+            <img class="mt-3 preview" src="<%= user.avatar.url %>" alt="" />
         </div>
 
         <button class="btn btn-dark btn-block w-100 tomato m_btn p-2 ps-5 pe-5">

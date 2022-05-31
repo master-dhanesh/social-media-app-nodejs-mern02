@@ -5,11 +5,20 @@ const User = require("../models/userModel");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const { isLoggedIn } = require("../middleware/auth");
-const upload = require("../middleware/multer");
+// const upload = require("../middleware/multer");
 
 const fs = require("fs");
+const cloudinary = require("cloudinary");
+const formidable = require("formidable");
 
 passport.use(new LocalStrategy(User.authenticate()));
+
+cloudinary.config({
+    cloud_name: "dhanesh-cloudinary",
+    api_key: "176257529696164",
+    api_secret: "FsvsmtHChA4V5HJXdYSuMzzRwSg",
+    secure: true,
+});
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -24,15 +33,31 @@ router.get("/register", function (req, res, next) {
     res.render("register");
 });
 
-router.post("/register", function (req, res, next) {
-    upload(req, res, (err) => {
-        const { username, name, email, password } = req.body;
+router.post("/register", async function (req, res, next) {
+    const form = formidable();
+    form.parse(req, async (err, fields, files) => {
+        if (err) return res.send(err);
+
+        const { username, name, email, password } = fields;
+
         const newUser = new User({
             username,
             name,
             email,
-            avatar: req.file.filename,
         });
+
+        if (files) {
+            const { public_id, secure_url } =
+                await cloudinary.v2.uploader.upload(files.avatar.filepath, {
+                    folder: "avatars",
+                    width: 1920,
+                    crop: "scale",
+                });
+            newUser.avatar = {
+                public_id,
+                url: secure_url,
+            };
+        }
 
         User.register(newUser, password)
             .then((user) => {
