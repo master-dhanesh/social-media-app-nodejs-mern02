@@ -5,9 +5,7 @@ const User = require("../models/userModel");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const { isLoggedIn } = require("../middleware/auth");
-// const upload = require("../middleware/multer");
 
-const fs = require("fs");
 const cloudinary = require("cloudinary");
 const formidable = require("formidable");
 
@@ -77,7 +75,6 @@ router.post(
 );
 
 router.get("/profile", isLoggedIn, function (req, res, next) {
-    // console.log(req.user);
     User.find()
         .then((users) => {
             res.render("profile", { users, loggedInUser: req.user });
@@ -140,11 +137,11 @@ router.post("/change-password/", async function (req, res, next) {
     }
 });
 
-router.get("/delete/:id", isLoggedIn, function (req, res, next) {
+router.get("/delete/:id", isLoggedIn, async function (req, res, next) {
     const { id } = req.params;
     User.findByIdAndDelete(id)
-        .then((user) => {
-            fs.unlinkSync(`./public/uploads/${user.avatar}`);
+        .then(async (user) => {
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
             if (id === req.user._id) return res.redirect("/logout");
             res.redirect("/profile");
         })
@@ -158,19 +155,30 @@ router.get("/update/:id", isLoggedIn, function (req, res, next) {
         .catch((err) => res.send(err));
 });
 
-router.post("/update/:id", isLoggedIn, function (req, res, next) {
-    upload(req, res, (err) => {
-        const { username, name, email, oldavatar } = req.body;
+router.post("/update/:id", isLoggedIn, async function (req, res, next) {
+    const form = formidable();
+    form.parse(req, async (err, fields, files) => {
+        if (err) return res.send(err);
+
+        const { username, name, email, oldavatar } = fields;
         const updatedUser = {
             username,
             name,
             email,
         };
 
-        if (req.file && req.file.filename) {
-            const avatar = req.file.filename;
-            updatedUser.avatar = avatar;
-            fs.unlinkSync(`./public/uploads/${oldavatar}`);
+        if (files && files.avatar) {
+            await cloudinary.v2.uploader.destroy(oldavatar);
+            const { public_id, secure_url } =
+                await cloudinary.v2.uploader.upload(files.avatar.filepath, {
+                    folder: "avatars",
+                    width: 1920,
+                    crop: "scale",
+                });
+            updatedUser.avatar = {
+                public_id,
+                url: secure_url,
+            };
         }
 
         const { id } = req.params;

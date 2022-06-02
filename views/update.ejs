@@ -42,7 +42,11 @@
                 class="form-control pt-2 pb-2 inputavatar"
             />
 
-            <input type="hidden" name="oldavatar" value="<%= user.avatar %>" />
+            <input
+                type="hidden"
+                name="oldavatar"
+                value="<%= user.avatar.public_id %>"
+            />
 
             <img class="mt-3 preview" src="<%= user.avatar.url %>" alt="" />
         </div>
