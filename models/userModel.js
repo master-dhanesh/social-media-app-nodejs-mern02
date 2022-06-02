@@ -32,14 +32,12 @@ const userModel = new Schema({
         type: Date,
         default: Date.now,
     },
-    // avatar: {
-    //     type: String,
-    //     default: "dummy.png",
-    // },
     avatar: {
         public_id: "",
         url: "",
     },
+    posts: [{ type: Schema.Types.ObjectId, ref: "post" }],
+    passwordResetCode: String,
 });
 
 userModel.plugin(plm);

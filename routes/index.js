@@ -20,15 +20,23 @@ cloudinary.config({
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-    res.render("index");
+    res.render("index", { isLoggedIn: false, user: req.user });
 });
 
 router.get("/login", function (req, res, next) {
-    res.render("login");
+    res.render("login", { isLoggedIn: false, user: req.user });
 });
 
 router.get("/register", function (req, res, next) {
-    res.render("register");
+    res.render("register", { isLoggedIn: false, user: req.user });
+});
+
+router.get("/home", isLoggedIn, function (req, res, next) {
+    res.render("Home", { isLoggedIn: true, user: req.user });
+});
+
+router.get("/timeline", isLoggedIn, function (req, res, next) {
+    res.render("timeline", { isLoggedIn: true, user: req.user });
 });
 
 router.post("/register", async function (req, res, next) {
@@ -68,7 +76,7 @@ router.post("/register", async function (req, res, next) {
 router.post(
     "/login",
     passport.authenticate("local", {
-        successRedirect: "/profile",
+        successRedirect: "/home",
         failureRedirect: "/login",
     }),
     function (req, res, next) {}
@@ -77,7 +85,8 @@ router.post(
 router.get("/profile", isLoggedIn, function (req, res, next) {
     User.find()
         .then((users) => {
-            res.render("profile", { users, loggedInUser: req.user });
+            res.render("profile", { users, isLoggedIn: true, user: req.user });
+            // res.render("profile", { isLoggedIn: true, user: req.user });
         })
         .catch((err) => res.send(err));
 });
@@ -88,7 +97,7 @@ router.get("/logout", isLoggedIn, function (req, res, next) {
 });
 
 router.get("/forgot-password", function (req, res, next) {
-    res.render("forgot");
+    res.render("forgot", { isLoggedIn: false, user: req.user });
 });
 
 router.post("/forgot-password", async function (req, res, next) {
@@ -102,7 +111,11 @@ router.post("/forgot-password", async function (req, res, next) {
 });
 
 router.get("/set-password/:id", function (req, res, next) {
-    res.render("setpassword", { id: req.params.id });
+    res.render("setpassword", {
+        id: req.params.id,
+        isLoggedIn: false,
+        user: req.user,
+    });
 });
 
 router.post("/set-password/:id", async function (req, res, next) {
@@ -122,7 +135,7 @@ router.post("/set-password/:id", async function (req, res, next) {
 });
 
 router.get("/change-password", isLoggedIn, function (req, res, next) {
-    res.render("changepassword");
+    res.render("changepassword", { isLoggedIn: true, user: req.user });
 });
 
 router.post("/change-password/", async function (req, res, next) {
@@ -151,7 +164,10 @@ router.get("/delete/:id", isLoggedIn, async function (req, res, next) {
 router.get("/update/:id", isLoggedIn, function (req, res, next) {
     const { id } = req.params;
     User.findById(id)
-        .then((user) => res.render("update", { user }))
+        .then((user) => {
+            res.render("update", { user });
+            // res.render('update', {isLoggedIn:false , user: req.user})
+        })
         .catch((err) => res.send(err));
 });
 
