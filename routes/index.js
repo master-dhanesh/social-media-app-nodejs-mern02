@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 const User = require("../models/userModel");
+const Post = require("../models/postModel");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const { isLoggedIn } = require("../middleware/auth");
@@ -31,12 +32,16 @@ router.get("/register", function (req, res, next) {
     res.render("register", { isLoggedIn: false, user: req.user });
 });
 
-router.get("/home", isLoggedIn, function (req, res, next) {
-    res.render("Home", { isLoggedIn: true, user: req.user });
+router.get("/home", isLoggedIn, async function (req, res, next) {
+    const posts = await Post.find().populate("createdBy").exec();
+    res.render("Home", { isLoggedIn: true, user: req.user, posts });
 });
 
-router.get("/timeline", isLoggedIn, function (req, res, next) {
-    res.render("timeline", { isLoggedIn: true, user: req.user });
+router.get("/timeline", isLoggedIn, async function (req, res, next) {
+    const { posts } = await User.findById(req.user._id)
+        .populate("posts")
+        .exec();
+    res.render("timeline", { isLoggedIn: true, user: req.user, posts });
 });
 
 router.post("/register", async function (req, res, next) {
@@ -85,8 +90,7 @@ router.post(
 router.get("/profile", isLoggedIn, function (req, res, next) {
     User.find()
         .then((users) => {
-            res.render("profile", { users, isLoggedIn: true, user: req.user });
-            // res.render("profile", { isLoggedIn: true, user: req.user });
+            res.render("profile", { isLoggedIn: true, user: req.user });
         })
         .catch((err) => res.send(err));
 });
@@ -203,6 +207,38 @@ router.post("/update/:id", isLoggedIn, async function (req, res, next) {
                 res.redirect("/profile");
             })
             .catch((err) => res.send(err));
+    });
+});
+
+router.post("/create-post", isLoggedIn, async function (req, res, next) {
+    const form = formidable();
+    form.parse(req, async (err, fields, files) => {
+        if (err) return res.send(err);
+        const { title, description } = fields;
+        const newPost = new Post({
+            title,
+            createdBy: req.user._id,
+        });
+        if (description) {
+            newPost.description = description;
+        }
+        if (files && files.media.size !== 0) {
+            const { public_id, secure_url } =
+                await cloudinary.v2.uploader.upload(files.media.filepath, {
+                    folder: "medias",
+                    width: 1920,
+                    crop: "scale",
+                });
+            newPost.media = {
+                public_id,
+                url: secure_url,
+            };
+        }
+
+        req.user.posts.push(newPost._id);
+        await req.user.save();
+        await newPost.save();
+        res.redirect("/timeline");
     });
 });
 

@@ -1,37 +1,21 @@
 <%- include('partials/header')%>
-<div class="container p-5">
-    <h1 class="text-center text-tomato mb-4">User | Profile Page</h1>
-    <p class="text-end w-75"><strong>👋<%= user.name%></strong></p>
-    <ol class="w-50 m-auto list-group list-group-numbered mt-3 mb-3">
-        <% users.forEach(user => { %>
-        <li
-            class="mb-3 list-group-item d-flex justify-content-between align-items-start"
-        >
-            <img
-                style="margin-left: 1vmax"
-                width="100"
-                src="<%= user.avatar.url %>"
-                alt=""
-            />
-            <div class="ms-2 me-auto">
-                <div class="fw-bold"><%= user.username%></div>
-                <%= user.name%> | <%= user.email%>
-            </div>
-            <div class="d-flex">
-                <a
-                    href="/update/<%= user._id%>"
-                    class="badge bg-primary text-light text-decoration-none rounded-pill"
-                    >update</a
-                >
-                &nbsp;
-                <a
-                    href="/delete/<%= user._id%>"
-                    class="badge bg-danger text-light text-decoration-none rounded-pill"
-                    >delete</a
-                >
-            </div>
-        </li>
-        <% }) %>
-    </ol>
+<div class="d-flex p-5">
+    <div class="col-md-2 col-sm-12 m-auto">
+        <img
+            width="100"
+            height="100"
+            class="rounded-circle"
+            src="<%= user.avatar.url%>"
+            alt=""
+        />
+        <br />
+        <hr />
+        <h2><%= user.name%></h2>
+    </div>
+    <div class="col-md-8 col-sm-12 m-auto">
+        <h3><%= user.username%></h3>
+        <h3><%= user.email%></h3>
+    </div>
 </div>
+
 <%- include('partials/footer')%>

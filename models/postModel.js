@@ -6,6 +6,8 @@ const postModel = new Schema(
         title: {
             type: String,
             trim: true,
+            required: [true, "title must not be empty"],
+            minlength: [4, "title must be atleast 6 characters long"],
         },
         description: {
             type: String,
