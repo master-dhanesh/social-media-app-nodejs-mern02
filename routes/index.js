@@ -1,14 +1,15 @@
 var express = require("express");
 var router = express.Router();
+const cloudinary = require("cloudinary");
+const formidable = require("formidable");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const { nanoid } = require("nanoid");
 
 const User = require("../models/userModel");
 const Post = require("../models/postModel");
-const passport = require("passport");
-const LocalStrategy = require("passport-local");
 const { isLoggedIn } = require("../middleware/auth");
-
-const cloudinary = require("cloudinary");
-const formidable = require("formidable");
+const sendEmail = require("../utils/sendEmail");
 
 passport.use(new LocalStrategy(User.authenticate()));
 
@@ -105,13 +106,62 @@ router.get("/forgot-password", function (req, res, next) {
 });
 
 router.post("/forgot-password", async function (req, res, next) {
-    const user = await User.findOne({ email: req.body.email }).exec();
+    const { email } = req.body;
+    const user = await User.findOne({ email }).exec();
     if (!user)
         return res.send(
             "User not found! 404 <a href='/forgot-password'>Forgot Password</a>"
         );
 
-    res.redirect(`/set-password/${user._id}`);
+    let resetcode = nanoid();
+    user.passwordResetCode = resetcode;
+    await user.save();
+
+    let message = `Your reset password link is ${
+        req.protocol +
+        "://" +
+        req.get("host") +
+        "reset-code/" +
+        resetcode +
+        "/" +
+        user._id
+    }`;
+
+    const dummylink =
+        req.protocol +
+        "://" +
+        req.get("host") +
+        "/reset-code/" +
+        resetcode +
+        "/" +
+        user._id;
+
+    // console.log(req.protocol + "://" + req.get("host") + req.originalUrl);
+
+    // await sendEmail({
+    //     email: user.email,
+    //     message,
+    // });
+    console.log(dummylink);
+    res.send(`<a target="_blank" href="${dummylink}">Reset Link</a>`);
+    // res.redirect(`/login`);
+});
+
+router.get("/reset-code/:resetToken/:id", async function (req, res, next) {
+    const { resetToken, id } = req.params;
+    const user = await User.findById(id).exec();
+
+    if (!user)
+        return res.send(
+            "User not found! 404 <a href='/forgot-password'>Forgot Password</a>"
+        );
+
+    if (user.passwordResetCode !== resetToken)
+        return res.send(
+            "Wrong Url! 404 <a href='/forgot-password'>Forgot Password</a>"
+        );
+
+    res.redirect(`/set-password/${id}`);
 });
 
 router.get("/set-password/:id", function (req, res, next) {
@@ -119,6 +169,7 @@ router.get("/set-password/:id", function (req, res, next) {
         id: req.params.id,
         isLoggedIn: false,
         user: req.user,
+        isLoggedIn: false,
     });
 });
 
@@ -130,6 +181,7 @@ router.post("/set-password/:id", async function (req, res, next) {
                 "User not found! 404 <a href='/forgot-password'>Forgot Password</a>"
             );
         await user.setPassword(req.body.password);
+        user.passwordResetCode = undefined;
         await user.save();
         res.redirect("/login");
     } catch (err) {
