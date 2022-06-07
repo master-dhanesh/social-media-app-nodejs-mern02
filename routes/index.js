@@ -294,4 +294,34 @@ router.post("/create-post", isLoggedIn, async function (req, res, next) {
     });
 });
 
+router.get("/like/:id", isLoggedIn, async function (req, res, next) {
+    const post = await Post.findById(req.params.id).exec();
+
+    if (!post.likes.includes(req.user._id)) {
+        post.likes.push(req.user._id);
+        if (post.dislikes.includes(req.user._id)) {
+            const ind = post.dislikes.indexOf(req.user._id);
+            post.dislikes.splice(ind, 1);
+        }
+    }
+
+    await post.save();
+    res.redirect("/home");
+});
+
+router.get("/dislike/:id", isLoggedIn, async function (req, res, next) {
+    const post = await Post.findById(req.params.id).exec();
+
+    if (!post.dislikes.includes(req.user._id)) {
+        post.dislikes.push(req.user._id);
+        if (post.likes.includes(req.user._id)) {
+            const ind = post.likes.indexOf(req.user._id);
+            post.likes.splice(ind, 1);
+        }
+    }
+
+    await post.save();
+    res.redirect("/home");
+});
+
 module.exports = router;

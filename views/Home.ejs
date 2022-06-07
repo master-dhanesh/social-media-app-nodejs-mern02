@@ -1,5 +1,38 @@
 <%- include('partials/header')%>
-<div class="container p-5 text-center">
-    <%= JSON.stringify(posts, null, 4)%>
+<div class="container p-5 d-flex">
+    <% posts.forEach(post => { %>
+    <div style="min-height: 450px" class="me-5 w-25 border border-dark p-3">
+        <img
+            width="50"
+            height="50"
+            class="rounded-circle"
+            src="<%= post.createdBy.avatar.url %>"
+            alt=""
+        />
+        <span><%= post.createdBy.name %></span>
+        <hr />
+        <h3><%= post.title%></h3>
+        <p><%= post.description %></p>
+        <div
+            style="
+                width: 100%;
+                height: 40%;
+                background-image: url(<%=post.media.url%>);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            "
+        ></div>
+        <hr />
+
+        <div>
+            <a class="text-decoration-none" href="/like/<%= post._id%>">👍</a
+            >(<%= post.likes.length%>)
+            <a class="text-decoration-none" href="/dislike/<%= post._id%>">👎</a
+            >(<%= post.dislikes.length%>)
+        </div>
+    </div>
+    <% }) %>
 </div>
+
 <%- include('partials/footer')%>
